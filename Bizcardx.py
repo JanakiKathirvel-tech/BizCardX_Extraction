@@ -7,6 +7,7 @@ import easyocr
 from PIL import Image
 import pandas as pd
 import numpy as np
+import mysql.connector
 
 
 def image_to_text(path):    
@@ -107,7 +108,12 @@ elif select == "Upload & Modifying":
 
     st.dataframe(concat_df)
 
-    button_1 = st.button("Save", use_container_width = True)
+    col1, col2 = st.columns(2)
+    with col1:
+       button_1 = st.button("Save")
+    with col2:
+       button_2 = st.button("Save in MySql")
+       
 
     if button_1:
 
@@ -141,6 +147,43 @@ elif select == "Upload & Modifying":
       mydb.commit()
 
       st.success("SAVED SUCCESSFULLY")
+
+
+    elif button_2:
+       print("Storing in Mysql...")
+       mydb= mysql.connector.connect(
+               host = "localhost",
+               user ="root",
+               password="Kamali@123",
+               database = "bizcardx"
+       )
+       mycursor = mydb.cursor()       
+       create_table_query_MySql = '''CREATE TABLE IF NOT EXISTS bizcard_details(name varchar(225),
+                                                                          designation varchar(225),
+                                                                          company_name varchar(225),
+                                                                          contact varchar(225),
+                                                                          email varchar(225),
+                                                                          website text,
+                                                                          address text,
+                                                                          pincode varchar(225),
+                                                                          image binary)'''
+
+       mycursor.execute(create_table_query_MySql)
+       #mydb.commit()
+
+      # Insert Query
+
+       insert_query = '''INSERT INTO bizcard_details(name, designation, company_name,contact, email, website, address,
+                                                    pincode, image)
+
+                                                    values(?,?,?,?,?,?,?,?,?)'''
+
+       datas = concat_df.values.tolist()[0]
+       #st.write(datas)
+       #mycursor.execute(insert_query,datas)
+       #mydb.commit()
+
+       st.success("Data SAVED in  Mysql SUCCESSFULLY")
 
   method =  st.radio("Select the Method",["None","Preview","Modify"])
 
