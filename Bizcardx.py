@@ -185,6 +185,8 @@ elif select == "Upload & Modifying":
 
        st.success("Data SAVED in  Mysql SUCCESSFULLY")
 
+      
+
   method =  st.radio("Select the Method",["None","Preview","Modify"])
 
   if method == "None":
